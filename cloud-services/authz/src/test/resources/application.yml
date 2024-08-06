@@ -1,0 +1,60 @@
+dogoo:
+    app:
+        jwtCookieName: dogoo-context
+        jwtExpirationMins: 15
+        jwtRefreshExpirationMins: 43200
+        jwtSecretKey: a5bwmwh++Mjlr0P6rnsJG1cTf2P4n/YRkY5F3KiC1ce4SYN8xYfntKUSAEEwzku0cribME7r8pkCt8D1f6MSmA==
+        cors:
+            allowed-origins: http://localhost:3000
+        oauth2:
+            redirectUri: http://localhost:3000/oauth2/redirect
+server:
+    port: 8080
+
+spring:
+    application:
+        name: authz
+
+    datasource:
+        password: 123456
+        url: jdbc:postgresql://localhost:5432/dg_office
+        username: dev
+    jpa:
+        defer-datasource-initialization: true
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
+    sql:
+        init:
+            mode: always
+
+    security:
+        oauth2:
+            client:
+                registration:
+                    github:
+                        clientId: ${GITHUB_CLIENT_ID}
+                        clientSecret: ${GITHUB_CLIENT_SECRET}
+                        scope: read:user, user:email
+                    google:
+                        clientId: ${GOOGLE_CLIENT_ID}
+                        clientSecret: ${GOOGLE_CLIENT_SECRET}
+                        scope: profile, email
+app:
+    eureka-username: u
+    eureka-password: p
+    eureka-server: localhost
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/
+        initialInstanceInfoReplicationIntervalSeconds: 5
+        registryFetchIntervalSeconds: 5
+    instance:
+        leaseRenewalIntervalInSeconds: 5
+        leaseExpirationDurationInSeconds: 5

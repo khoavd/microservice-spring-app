@@ -1,0 +1,17 @@
+rootProject.name = 'microservices-app'
+
+include(':app-apis:product-composite-api')
+include(':app-apis:product-api')
+include(':app-apis:product-client')
+include(':app-apis:recommendation-api')
+include(':app-apis:recommendation-client')
+include(':app-apis:review-api')
+include(':app-apis:review-client')
+include(':app-services:product-service')
+include(':app-services:review-service')
+include(':app-services:recommendation-service')
+include(':app-services:product-composite-service')
+include(':cloud-services:discovery-service')
+include(':cloud-services:gateway')
+include(':cloud-services:authz')
+include(':cloud-services:config-server')

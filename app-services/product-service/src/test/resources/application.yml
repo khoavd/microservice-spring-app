@@ -1,0 +1,69 @@
+spring:
+    jpa:
+        defer-datasource-initialization: true
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
+    r2dbc:
+        password: 123456
+        url: r2dbc:postgresql://localhost:5432/dg_office
+        username: dev
+    sql:
+        init:
+            mode: always
+server:
+    port: 7001
+
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+spring.cloud.function.definition: messageProcessor
+
+spring.cloud.stream:
+    defaultBinder: rabbit
+    default.contentType: application/json
+    bindings.messageProcessor-in-0:
+        destination: products
+        group: productsGroup
+
+spring.cloud.stream.bindings.messageProcessor-in-0.consumer:
+    maxAttempts: 3
+    backOffInitialInterval: 500
+    backOffMaxInterval: 1000
+    backOffMultiplier: 2.0
+
+spring.cloud.stream.rabbit.bindings.messageProcessor-in-0.consumer:
+    autoBindDlq: true
+    republishToDlq: true
+
+spring.cloud.stream.kafka.bindings.messageProcessor-in-0.consumer:
+    enableDlq: true
+
+spring.cloud.stream.kafka.binder:
+    brokers: 127.0.0.1
+    defaultBrokerPort: 9092
+
+spring.rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"

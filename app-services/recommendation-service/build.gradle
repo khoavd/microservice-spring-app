@@ -1,0 +1,41 @@
+group = 'com.dogoo.ecommerce.recommendation.service'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-jetty'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.retry:spring-retry'
+
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.postgresql:r2dbc-postgresql'
+
+    implementation(project(':app-apis:recommendation-api'))
+
+    implementation (group: 'com.dogoo.exception.handler', name: 'exceptions-handler', version: '1.0.6', classifier: 'plain')
+    implementation (group: 'com.dogoo.common.lib', name: 'common-lib', version: '1.0.1', classifier: 'plain')
+
+    modules {
+        module("org.springframework.boot:spring-boot-starter-tomcat") {
+            replacedBy("org.springframework.boot:spring-boot-starter-jetty")
+        }
+    }
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+bootJar {
+    enabled = true
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

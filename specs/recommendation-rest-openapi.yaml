@@ -1,0 +1,176 @@
+components:
+    schemas:
+        Recommendation:
+            description: Recommendation
+            properties:
+                id:
+                    type: string
+                    example: a3544f07-830e-4399-b7eb-724e35e8ed75
+                productId:
+                    type: string
+                    example: 73ca6835-08e8-4846-aae4-244557485acd
+                author:
+                    type: string
+                rate:
+                    type: number
+                    format: double
+                content:
+                    type: string
+info:
+    description: "Recommendation REST API"
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    title: "RecommendationRest"
+    version: v1.0
+openapi: 3.0.1
+
+paths:
+    "/recommendations/by-product/{productId}":
+        get:
+            tags: ["Recommendation"]
+            description:
+                Retrieves the Recommendations. Results can be paginated, filtered, searched, and sorted.
+            operationId: getRecommendations
+            parameters:
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                - in: path
+                  name: productId
+                  required: true
+                  schema:
+                      type: string
+                      example: 73ca6835-08e8-4846-aae4-244557485acd
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Recommendation"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Recommendation"
+                                type: array
+        post:
+            tags: ["Recommendation"]
+            description: Create new a Recommendation
+            operationId: postRecommendation
+            parameters:
+                - in: path
+                  name: productId
+                  required: true
+                  schema:
+                      type: string
+                      example: 73ca6835-08e8-4846-aae4-244557485acd
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Recommendation"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Recommendation"
+            responses:
+                201:
+                    description:
+                        "Create a Recommendation"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+    "/recommendations/{recId}":
+        put:
+            tags: ["Recommendation"]
+            description: Update a Recommendation
+            operationId: putRecommendation
+            parameters:
+                - in: path
+                  name: recId
+                  required: true
+                  schema:
+                      type: string
+                      example: 620c6755-f627-49e5-bf2b-741542e1049e
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Recommendation"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Recommendation"
+            responses:
+                200:
+                    description:
+                        "Update a Recommendation"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+        get:
+            tags: ["Recommendation"]
+            description: Get a Recommendation
+            operationId: getRecommendation
+            parameters:
+                - in: path
+                  name: recId
+                  required: true
+                  schema:
+                      type: string
+                      example: 620c6755-f627-49e5-bf2b-741542e1049e
+            responses:
+                200:
+                    description:
+                        "Update an Recommendation"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Recommendation"
+        delete:
+            tags: ["Recommendation"]
+            description: Delete a Recommendation
+            operationId: deleteRecommendation
+            parameters:
+                - in: path
+                  name: recId
+                  required: true
+                  schema:
+                      type: string
+                      example: 620c6755-f627-49e5-bf2b-741542e1049e
+            responses:
+                204:
+                    description:
+                        "Update an Recommendation"
+                    content:
+                        application/json: {}
+                        application/xml: {}

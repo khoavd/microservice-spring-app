@@ -1,0 +1,45 @@
+plugins {
+    id 'org.openapi.generator' version '7.5.0'
+}
+
+group = 'com.dogoo.ecommerce.product.composite.api'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.6'
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
+    modules {
+        module("org.springframework.boot:spring-boot-starter-tomcat") {
+            replacedBy("org.springframework.boot:spring-boot-starter-jetty")
+        }
+    }
+}
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/specs/product-composite-rest-openapi.yaml")
+    apiPackage.set("com.dogoo.ecommerce.product.composite.api")
+    modelPackage.set("com.dogoo.ecommerce.product.composite.api.model")
+    configOptions.put("gradleBuildFile", "false")
+    configOptions.put("useSpringBoot3", "true")
+    configOptions.put("documentationProvider", "none")
+    configOptions.put("datesLibrary", "java8")
+    configOptions.put("reactive", "true")
+
+    generateApiTests.set(false)
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+sourceSets.getByName("main").java.srcDir("$buildDir/generate-resources/main/src/main/java")
+
+tasks.compileJava.dependsOn(tasks.openApiGenerate)

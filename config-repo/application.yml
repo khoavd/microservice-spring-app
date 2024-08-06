@@ -1,0 +1,56 @@
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+spring.cloud.stream.kafka.binder:
+  brokers: 127.0.0.1
+  defaultBrokerPort: 9092
+
+spring.rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
+
+spring.cloud.stream.defaultBinder: rabbit
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
+management.zipkin.tracing.endpoint: http://zipkin-server:9411/api/v2/spans
+management.tracing.sampling.probability: 1.0
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+---
+spring.config.activate.on-profile: docker
+
+spring.rabbitmq.host: rabbitmq
+
+spring.cloud.stream.kafka.binder.brokers: kafka
+
+app:
+  eureka-server: eureka
+
+---
+spring.config.activate.on-profile: kafka
+
+management.health.rabbit.enabled: false
+spring.cloud.stream.defaultBinder: kafka
+spring.kafka.bootstrap-servers: kafka:9092
+spring.cloud.stream.kafka.binder.replication-factor: 1

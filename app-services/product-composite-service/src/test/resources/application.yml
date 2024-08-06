@@ -1,0 +1,62 @@
+spring.mvc.problemdetails.enabled: true
+
+dogoo:
+  app:
+    jwt-secret-key: YTVid213aCsrTWpscjBQNnJuc0pHMWNUZjJQNG4vWVJrWTVGM0tpQzFjZTRTWU44eFlmbnRLVVNBRUV3emt1MGNyaWJNRTdyOHBrQ3Q4RDFmNk1TbUE9PQ==
+app:
+  service:
+    product:
+      host: localhost
+      port: 7001
+      scheme: http
+    review:
+      host: localhost
+      port: 7002
+      scheme: http
+    recommendation:
+      host: localhost
+      port: 7003
+      scheme: http
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+spring.cloud.stream:
+  defaultBinder: rabbit
+  default.contentType: application/json
+  bindings:
+    products-out-0:
+      destination: products
+      producer:
+        required-groups: auditGroup
+    recommendations-out-0:
+      destination: recommendations
+      producer:
+        required-groups: auditGroup
+    reviews-out-0:
+      destination: reviews
+      producer:
+        required-groups: auditGroup
+
+spring.cloud.stream.kafka.binder:
+  brokers: 127.0.0.1
+  defaultBrokerPort: 9092
+
+spring.rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"

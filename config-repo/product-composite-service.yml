@@ -1,0 +1,115 @@
+dogoo:
+  app:
+    jwt-secret-key: YTVid213aCsrTWpscjBQNnJuc0pHMWNUZjJQNG4vWVJrWTVGM0tpQzFjZTRTWU44eFlmbnRLVVNBRUV3emt1MGNyaWJNRTdyOHBrQ3Q4RDFmNk1TbUE9PQ==
+
+server:
+    port: 7009
+
+app:
+    service:
+        product:
+            host: localhost
+            port: 7001
+            scheme: http
+        review:
+            host: localhost
+            port: 7002
+            scheme: http
+        recommendation:
+            host: localhost
+            port: 7003
+            scheme: http
+
+spring.cloud.stream:
+    default.contentType: application/json
+    bindings:
+        products-out-0:
+            destination: products
+            producer:
+                required-groups: auditGroup
+        recommendations-out-0:
+            destination: recommendations
+            producer:
+                required-groups: auditGroup
+        reviews-out-0:
+            destination: reviews
+            producer:
+                required-groups: auditGroup
+
+resilience4j.timelimiter:
+  instances:
+    product:
+      timeoutDuration: 2s
+
+resilience4j.retry:
+  instances:
+    product:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - org.springframework.web.reactive.function.client.WebClientResponseException$InternalServerError
+
+management.health.circuitbreakers.enabled: true
+
+resilience4j.circuitbreaker:
+  instances:
+    product:
+      allowHealthIndicatorToFail: false
+      registerHealthIndicator: true
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 5
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      ignoreExceptions:
+        - com.dogoo.exception.model.BadRequestException
+        - com.dogoo.exception.model.CustomErrorResponse
+        - com.dogoo.exception.model.EventProcessingException
+        #- com.dogoo.exception.model.InternalServerException
+        - com.dogoo.exception.model.InvalidInputException
+        - com.dogoo.exception.model.NotFoundException
+        - com.dogoo.exception.model.UnAuthorizedException
+
+logging:
+  level:
+    root: INFO
+    com.dogoo: INFO
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: INFO
+---
+spring:
+    config:
+        activate:
+            on-profile: docker
+server:
+    port: 8080
+
+app:
+    service:
+        product:
+            host: product-service
+            port: 0
+            scheme: http
+        review:
+            host: review-service
+            port: 0
+            scheme: http
+        recommendation:
+            host: recommendation-service
+            port: 0
+            scheme: http
+
+---
+spring.config.activate.on-profile: streaming_partitioned
+
+spring.cloud.stream.bindings.products-out-0.producer:
+  partition-key-expression: headers['partitionKey']
+  partition-count: 2
+
+spring.cloud.stream.bindings.recommendations-out-0.producer:
+  partition-key-expression: headers['partitionKey']
+  partition-count: 2
+
+spring.cloud.stream.bindings.reviews-out-0.producer:
+  partition-key-expression: headers['partitionKey']
+  partition-count: 2

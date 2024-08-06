@@ -1,0 +1,173 @@
+components:
+    schemas:
+        ProductComposite:
+            description: ProductComposite
+            properties:
+                id:
+                    type: string
+                    example: a9170b7e-4e37-4a84-a09b-41c10170b26d
+                    readOnly: true
+                name:
+                    type: string
+                weight:
+                    type: number
+                    format: double
+                serviceAddress:
+                    type: string
+                reviews:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ReviewComposite'
+                recommendations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecommendationComposite'
+        ReviewComposite:
+            description: Review
+            properties:
+                id:
+                    type: string
+                    example: 5b0117c3-a4bf-43e4-927c-ba9c55dfac67
+                productId:
+                    type: string
+                    example: ff0d3bcb-b865-47a1-bceb-9a1ea6e29407
+                    readOnly: true
+                author:
+                    type: string
+
+                content:
+                    type: string
+                subject:
+                    type: string
+        RecommendationComposite:
+            description: Review
+            properties:
+                id:
+                    type: string
+                    example: 5b0117c3-a4bf-43e4-927c-ba9c55dfac67
+                productId:
+                    type: string
+                    example: ff0d3bcb-b865-47a1-bceb-9a1ea6e29407
+                    readOnly: true
+                author:
+                    type: string
+
+                rate:
+                    type: number
+                    format: double
+                content:
+                    type: string
+info:
+    description: "Product REST API"
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    title: "ProductRest"
+    version: v1.0
+openapi: 3.0.1
+
+paths:
+    "/products-composite/{productId}":
+        get:
+            tags: ["ProductComposite"]
+            description:
+                Get Product Composite By Id
+            operationId: getProductComposites
+            parameters:
+                - in: path
+                  name: productId
+                  schema:
+                      type: string
+                  required: true
+                - in: query
+                  name: delay
+                  schema:
+                      type: integer
+                      format: int32
+                  required: false
+                - in: query
+                  name: faultPercent
+                  schema:
+                      type: integer
+                      format: int32
+                  required: false
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"
+        delete:
+            tags: ["ProductComposite"]
+            description:
+                Delete a Product Composite By Id
+            operationId: deleteProductComposite
+            parameters:
+                - in: path
+                  name: productId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json: {}
+                        application/xml: {}
+        put:
+            tags: ["ProductComposite"]
+            description:
+                Update a Product Composite By Id
+            operationId: updateProductComposite
+            parameters:
+                - in: path
+                  name: productId
+                  schema:
+                      type: string
+                  required: true
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProductComposite"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ProductComposite"
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"
+    "/products-composite":
+        post:
+            tags: ["ProductComposite"]
+            description:
+                Add Product Composite
+            operationId: addProductComposite
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProductComposite"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ProductComposite"
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ProductComposite"

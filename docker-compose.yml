@@ -1,0 +1,135 @@
+version: '2.1'
+
+services:
+  psql-db:
+    image: postgres:12.14
+    container_name: ecommerce-db
+    restart: always
+    environment:
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=product
+    ports:
+      - '5433:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: cloud-services/gateway
+    mem_limit: 512m
+    ports:
+      - "8443:8443"
+
+  eureka:
+    build: cloud-services/discovery-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  authz:
+    build: cloud-services/authz
+    mem_limit: '512m'
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql-db:5432/product
+      - SPRING_DATASOURCE_USERNAME=dev
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENTID=${GITHUB_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENTSECRET=${GITHUB_CLIENT_SECRET}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${GOOGLE_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      psql-db:
+        condition: service_healthy
+
+  config-server:
+    build: cloud-services/config-server
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,native
+      - ENCRYPT_KEY=${CONFIG_SERVER_ENCRYPT_KEY}
+      - SPRING_SECURITY_USER_NAME=${CONFIG_SERVER_USR}
+      - SPRING_SECURITY_USER_PASSWORD=${CONFIG_SERVER_PWD}
+    volumes:
+      - $PWD/config-repo:/config-repo
+
+  product:
+    build: app-services/product-service
+    mem_limit: '512m'
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_R2DBC_URL=r2dbc:postgresql://psql-db:5432/product
+      - SPRING_R2DBC_USERNAME=dev
+      - SPRING_R2DBC_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      psql-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  review:
+    build: app-services/review-service
+    mem_limit: '512m'
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_R2DBC_URL=r2dbc:postgresql://psql-db:5432/product
+      - SPRING_R2DBC_USERNAME=dev
+      - SPRING_R2DBC_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      psql-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  recommendation:
+    build: app-services/recommendation-service
+    mem_limit: '512m'
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_R2DBC_URL=r2dbc:postgresql://psql-db:5432/product
+      - SPRING_R2DBC_USERNAME=dev
+      - SPRING_R2DBC_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      psql-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  product-composite:
+    build: app-services/product-composite-service
+    mem_limit: 512m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  
+  rabbitmq:
+    image: rabbitmq:3.11.8-management
+    mem_limit: 512m
+    ports:
+      - 5673:5672
+      - 15673:15672
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+  zipkin-server:
+    image: openzipkin/zipkin:latest
+    restart: always
+    mem_limit: 1024m
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411

@@ -1,0 +1,170 @@
+components:
+    schemas:
+        Review:
+            description: Review
+            properties:
+                id:
+                    type: string
+                    example: 9f7900b2-712b-4ec4-8c9b-4f1927b2124c
+                productId:
+                    type: string
+                    example: 1e86fe63-3315-49c6-8f1c-07b32ada06f8
+                author:
+                    type: string
+                subject:
+                    type: string
+                content:
+                    type: string
+info:
+    description: "Review REST API"
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    title: "ReviewRest"
+    version: v1.0
+openapi: 3.0.1
+
+paths:
+    "/reviews/by-product/{productId}":
+        get:
+            tags: ["Review"]
+            description:
+                Retrieves the Reviews. Results can be paginated, filtered, searched, and sorted.
+            operationId: getReviews
+            parameters:
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                - in: path
+                  name: productId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: The data returned
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Review"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Review"
+                                type: array
+        post:
+            tags: ["Review"]
+            description: Create new a Review
+            operationId: postReview
+            parameters:
+                - in: path
+                  name: productId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Review"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Review"
+            responses:
+                201:
+                    description:
+                        "Create a Review"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+    "/reviews/{reviewId}":
+        put:
+            tags: ["Review"]
+            description: Update a Review
+            operationId: putReview
+            parameters:
+                - in: path
+                  name: reviewId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Review"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Review"
+            responses:
+                200:
+                    description:
+                        "Update a Review"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+        get:
+            tags: ["Review"]
+            description: Get a Review
+            operationId: getReview
+            parameters:
+                - in: path
+                  name: reviewId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description:
+                        "Update an Review"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Review"
+        delete:
+            tags: ["Review"]
+            description: Delete a Review
+            operationId: deleteReview
+            parameters:
+                - in: path
+                  name: reviewId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                204:
+                    description:
+                        "Update an Review"
+                    content:
+                        application/json: {}
+                        application/xml: {}
